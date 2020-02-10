@@ -101,7 +101,7 @@ public class PixelAuctionGenerations {
 
 
         Sponge.getCommandManager().register(this, pixAuction, "auc", "auction", "pauc");
-        Sponge.getCommandManager().register(this, pixBid, "aucbid", "auctionbid", "pabit");
+        Sponge.getCommandManager().register(this, pixBid, "aucbid", "auctionbid", "pabid");
         Sponge.getCommandManager().register(this, pixAuctionCancel, "auccancel", "auctioncancel", "pacancel");
         Sponge.getCommandManager().register(this, pixAuctionHide, "auchide", "auctionhide", "pahide");
         Sponge.getEventManager().registerListeners(this, new PlayerListener());

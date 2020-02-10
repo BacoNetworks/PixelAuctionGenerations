@@ -140,7 +140,14 @@ public class PokemonAuction {
         PlayerStorage playerPartyStorage = PixelmonStorage.pokeBallManager.getPlayerStorageFromUUID(this.seller).get();
         Optional<Player> playerOptional = Sponge.getServer().getPlayer(this.seller);
         Text Cancelled;
-        if (playerPartyStorage.partyPokemon.length < 6) {
+        int AmountOfPokemon = 0;
+
+        for (int i = 0; i < playerPartyStorage.partyPokemon.length; i++) {
+            if (playerPartyStorage.partyPokemon[i] != null) {
+                AmountOfPokemon++;
+            }
+        }
+        if (AmountOfPokemon <= 5) {
             playerPartyStorage.addToFirstEmptySpace(getPokemonForSale());
             Cancelled = Text.of(TextColors.RED, " Unfortunately your auction fell through, your Pokemon has been returned to your party!");
         } else {
