@@ -153,6 +153,6 @@ public class Utils {
             sell = Text.builder().append(Text.of(TextColors.GRAY, "[", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/auc bid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Click to increase bid by $", incrementation))).build();
         }
         Text StartedBy = Text.of(TextColors.DARK_RED, TextStyles.BOLD, sellerOptional.get().getName(), " is hosting an auction:", Text.NEW_LINE);
-        return Text.of(StartedBy, sell, TextColors.GRAY, "[", TextColors.RED, time, "s", TextColors.GRAY, "] ", info, " [",IVs, TextColors.GRAY, "-", EVS, TextColors.GRAY, "-", Moves, TextColors.GRAY, "]");
+        return Text.of("", Text.NEW_LINE, StartedBy, sell, TextColors.GRAY, "[", TextColors.RED, time, "s", TextColors.GRAY, "] ", info, " [",IVs, TextColors.GRAY, "-", EVS, TextColors.GRAY, "-", Moves, TextColors.GRAY, "]", Text.NEW_LINE, "");
     }
 }
