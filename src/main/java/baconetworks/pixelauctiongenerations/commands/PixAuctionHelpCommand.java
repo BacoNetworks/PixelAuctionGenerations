@@ -19,7 +19,8 @@ import java.util.List;
 public class PixAuctionHelpCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        String[] Commands = {"/pauc <slot> <price> <increment> <duration>", "/pabid <amount>", "/pacancel", "/pahide"};
+        String[] Commands = {"/auc create <slot> <price> <increment> <duration>", "/auc bid <amount>", "/auc cancel", "/auc hide"};
+        String[] CommandsSuggest = {"/auc create", "/auc bid", "/auc cancel", "/auc hide"};
         String[] Descriptions = {"Creates an auction selling the Pokemon from the player's chosen party slot, with the initial price and the bid increment defined by the player.", "Places a bid on the currently active auction, increasing the bid by the specified amount.", "Cancels the player's pending auction.", "Hide the auction announcements"};
         //Some definitions
         List<Text> texts = new ArrayList<>();
@@ -30,7 +31,7 @@ public class PixAuctionHelpCommand implements CommandExecutor {
                             .color(TextColors.GOLD)
                             .style(TextStyles.BOLD)
                             .append(Text.of(Commands[i]))
-                            .onClick(TextActions.suggestCommand(Commands[i]))
+                            .onClick(TextActions.suggestCommand(CommandsSuggest[i]))
                             .onHover(TextActions.showText(Text.of(Descriptions[i])))
                             .build())
                     .build());

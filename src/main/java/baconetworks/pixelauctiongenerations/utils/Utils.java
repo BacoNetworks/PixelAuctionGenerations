@@ -84,6 +84,7 @@ public class Utils {
 
     public static Text getHoverText(EntityPixelmon data, @Nullable UUID seller, UUID bidder, int price, int time, int incrementation, boolean showBidder, boolean showIVs) {
         Text sell = null;
+        Text info = null;
         LiteralText IVs;
         Optional<User> sellerOptional = Sponge.getGame().getServiceManager().provide(UserStorageService.class).flatMap(userStorageService -> userStorageService.get(seller));
 
@@ -106,48 +107,52 @@ public class Utils {
             Shiny = "False";
         }
 
-        Text hover = Text.of("", TextColors.DARK_GREEN, TextStyles.BOLD, name, TextStyles.RESET, "\n",
-                TextColors.AQUA, "Level: ", data.getLvl().getLevel(), "\n",
-                TextColors.GOLD, "Shiny: " + Shiny, "\n",
+        String Breedable;
+        if (PokemonSpec.from(new String[]{"unbreedable"}).matches(data)) {
+            Breedable = "False";
+        }else{
+            Breedable = "True";
+        }
+
+        Text hover = Text.of(
+                TextColors.AQUA, TextStyles.BOLD, "Level: ", data.getLvl().getLevel(), "\n",
+                TextStyles.RESET, TextColors.GOLD, "Shiny: " + Shiny, "\n",
                 TextColors.YELLOW, "Nature: ", data.getNature().getLocalizedName(), "\n",
                 TextColors.GOLD, "Ability: ", (data.getAbilitySlot() != 2) ? TextColors.GOLD : TextColors.GRAY, data.getAbility().getName(), "\n",
                 TextColors.GREEN, "Growth: ", data.getGrowth().toString(), "\n",
                 TextColors.RED, "Item: ", heldItem, "\n",
                 TextColors.BLUE, "Gender: ", data.getGender().name(), "\n",
                 TextColors.LIGHT_PURPLE, "Ball Type: ", data.caughtBall.name(), "\n",
-                TextColors.DARK_PURPLE, "Orig. Trainer: ", data.originalTrainer, "\n");
+                TextColors.DARK_PURPLE, "Orig. Trainer: ", data.originalTrainer, "\n",
+                TextColors.RED, "Breedable: ", Breedable);
 
-        if (PokemonSpec.from(new String[]{"unbreedable"}).matches(data)) {
-            hover = hover.concat(Text.of("\n", TextColors.RED, "Breedable: False"));
+        if (data.isShiny()) {
+            info = Text.builder((data.getSpecies()).name).color(TextColors.GOLD).onHover(TextActions.showText(hover)).build();
         } else {
-            hover = hover.concat(Text.of("\n", TextColors.GREEN, "Breedable: True"));
+            info = Text.builder((data.getSpecies()).name).color(TextColors.GREEN).onHover(TextActions.showText(hover)).build();
         }
-
-
-        Text Info = Text.builder("Info").color(TextColors.YELLOW).onHover(TextActions.showText(hover)).build();
 
         if (showIVs) {
-            IVs = Text.builder("IV's").color(TextColors.LIGHT_PURPLE).onHover(TextActions.showText(Text.of("", TextColors.LIGHT_PURPLE, TextStyles.UNDERLINE, "IV's", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", data.stats.IVs.HP, "\n", TextColors.RED, "Attack: ", data.stats.IVs.Attack, "\n", TextColors.GOLD, "Defence: ", data.stats.IVs.Defence, "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", (data.stats.IVs.SpAtt), "\n", TextColors.YELLOW, "Sp. Defence: ", data.stats.IVs.SpDef, "\n", TextColors.DARK_AQUA, "Speed: ", data.stats.IVs.Speed))).build();
+            IVs = Text.builder("IV's").color(TextColors.LIGHT_PURPLE).onHover(TextActions.showText(Text.of("", TextColors.LIGHT_PURPLE, TextStyles.BOLD, "IV's:", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", data.stats.IVs.HP, "\n", TextColors.RED, "Attack: ", data.stats.IVs.Attack, "\n", TextColors.GOLD, "Defence: ", data.stats.IVs.Defence, "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", (data.stats.IVs.SpAtt), "\n", TextColors.YELLOW, "Sp. Defence: ", data.stats.IVs.SpDef, "\n", TextColors.DARK_AQUA, "Speed: ", data.stats.IVs.Speed))).build();
         } else {
-            IVs = Text.builder("IV's").color(TextColors.LIGHT_PURPLE).onHover(TextActions.showText(Text.of("", TextColors.LIGHT_PURPLE, TextStyles.UNDERLINE, "IV's", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", "..", "\n", TextColors.RED, "Attack: ", "..", "\n", TextColors.GOLD, "Defence: ", "..", "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", "..", "\n", TextColors.YELLOW, "Sp. Defence: ", "..", "\n", TextColors.DARK_AQUA, "Speed: ", ".."))).build();
+            IVs = Text.builder("IV's").color(TextColors.LIGHT_PURPLE).onHover(TextActions.showText(Text.of("", TextColors.LIGHT_PURPLE, TextStyles.BOLD, "IV's:", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", "..", "\n", TextColors.RED, "Attack: ", "..", "\n", TextColors.GOLD, "Defence: ", "..", "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", "..", "\n", TextColors.YELLOW, "Sp. Defence: ", "..", "\n", TextColors.DARK_AQUA, "Speed: ", ".."))).build();
         }
-        Text EVS = Text.builder("EV's").color(TextColors.RED).onHover(TextActions.showText(Text.of("", TextColors.GOLD, TextStyles.UNDERLINE, "EV's", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", data.stats.EVs.HP, "\n", TextColors.RED, "Attack: ", data.stats.EVs.Attack, "\n", TextColors.GOLD, "Defence: ", data.stats.EVs.Defence, "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", data.stats.EVs.SpecialAttack, "\n", TextColors.YELLOW, "Sp. Defence: ", data.stats.EVs.SpecialDefence, "\n", TextColors.DARK_AQUA, "Speed: ", data.stats.EVs.Speed))).build();
-        Text Moves = Text.builder("Moves").color(TextColors.BLUE).onHover(TextActions.showText(Text.of("", TextColors.BLUE, TextStyles.UNDERLINE, "Moveset", TextStyles.RESET, "\n", TextColors.DARK_PURPLE, "Move 1: ", (data.getMoveset().attacks[0] != null) ? data.getMoveset().attacks[0].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.LIGHT_PURPLE, "Move 2: ", (data.getMoveset().attacks[1] != null) ? data.getMoveset().attacks[1].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.AQUA, "Move 3: ", (data.getMoveset().attacks[2] != null) ? data.getMoveset().attacks[2].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.DARK_AQUA, "Move 4: ", (data.getMoveset().attacks[3] != null) ? data.getMoveset().attacks[3].baseAttack.getLocalizedName() : "N/A"))).build();
+        Text EVS = Text.builder("EV's").color(TextColors.RED).onHover(TextActions.showText(Text.of("", TextColors.GOLD, TextStyles.BOLD, "EV's:", TextStyles.RESET, "\n", TextColors.DARK_GREEN, "HP: ", data.stats.EVs.HP, "\n", TextColors.RED, "Attack: ", data.stats.EVs.Attack, "\n", TextColors.GOLD, "Defence: ", data.stats.EVs.Defence, "\n", TextColors.LIGHT_PURPLE, "Sp. Attack: ", data.stats.EVs.SpecialAttack, "\n", TextColors.YELLOW, "Sp. Defence: ", data.stats.EVs.SpecialDefence, "\n", TextColors.DARK_AQUA, "Speed: ", data.stats.EVs.Speed))).build();
+        Text Moves = Text.builder("Moves").color(TextColors.BLUE).onHover(TextActions.showText(Text.of("", TextColors.BLUE, TextStyles.BOLD, "Moveset:", TextStyles.RESET, "\n", TextColors.DARK_PURPLE, "Move 1: ", (data.getMoveset().attacks[0] != null) ? data.getMoveset().attacks[0].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.LIGHT_PURPLE, "Move 2: ", (data.getMoveset().attacks[1] != null) ? data.getMoveset().attacks[1].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.AQUA, "Move 3: ", (data.getMoveset().attacks[2] != null) ? data.getMoveset().attacks[2].baseAttack.getLocalizedName() : "N/A", "\n", TextColors.DARK_AQUA, "Move 4: ", (data.getMoveset().attacks[3] != null) ? data.getMoveset().attacks[3].baseAttack.getLocalizedName() : "N/A"))).build();
 
         if (showBidder) {
             if (bidder == null) {
-                sell = Text.builder().append(Text.of("", TextColors.GRAY, " [", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/pabid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Click to increase bid by $", incrementation))).build();
+                sell = Text.builder().append(Text.of(TextColors.GRAY, "[", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/auc bid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Click to increase bid by $", incrementation))).build();
             } else {
                 Optional<User> bidderOptional = Sponge.getGame().getServiceManager().provide(UserStorageService.class).flatMap(provide -> provide.get(bidder));
                 if (bidderOptional.isPresent()) {
-                    sell = Text.builder().append(Text.of("", TextColors.GRAY, " [", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/pabid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Highest bidder: ", TextColors.GOLD, bidderOptional.get().getName(), "\n", TextColors.RED, "Click to increase bid by $", incrementation))).build();
+                    sell = Text.builder().append(Text.of(TextColors.GRAY, "[", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/auc bid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Highest bidder: ", TextColors.GOLD, bidderOptional.get().getName(), "\n", TextColors.RED, "Click to increase bid by $", incrementation))).build();
                 }
             }
         } else {
-            sell = Text.builder().append(Text.of("", TextColors.GRAY, " [", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/pabid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Click to increase bid by $", incrementation))).build();
+            sell = Text.builder().append(Text.of(TextColors.GRAY, "[", TextColors.AQUA, "Auc", TextColors.GRAY, ": ", TextColors.GOLD, "$", price, TextColors.GRAY, "]")).onClick(TextActions.runCommand("/auc bid " + (price + incrementation))).onHover(TextActions.showText(Text.of(TextColors.RED, "Click to increase bid by $", incrementation))).build();
         }
-
-        return Text.of(TextColors.LIGHT_PURPLE, sellerOptional.get().getName(), ":", sell, TextColors.GRAY, "[", TextColors.RED, time, "s", TextColors.GRAY, "] ", TextColors.GREEN,
-                data.isShiny() ? TextColors.GOLD : "", (data.getSpecies()).name, TextColors.GRAY, " [", Info, TextColors.GRAY, "-", IVs, TextColors.GRAY, "-", EVS, TextColors.GRAY, "-", Moves, TextColors.GRAY, "]");
+        Text StartedBy = Text.of(TextColors.DARK_RED, TextStyles.BOLD, sellerOptional.get().getName(), " is hosting an auction:", Text.NEW_LINE);
+        return Text.of(StartedBy, sell, TextColors.GRAY, "[", TextColors.RED, time, "s", TextColors.GRAY, "] ", info, " [",IVs, TextColors.GRAY, "-", EVS, TextColors.GRAY, "-", Moves, TextColors.GRAY, "]");
     }
 }

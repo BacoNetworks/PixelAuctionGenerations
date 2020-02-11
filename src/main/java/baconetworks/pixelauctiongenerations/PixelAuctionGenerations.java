@@ -76,19 +76,10 @@ public class PixelAuctionGenerations {
 
         CommandSpec AucHelp = CommandSpec.builder().executor(new PixAuctionHelpCommand()).permission("pixelauction.command.help").build();
 
-        CommandSpec pixAuction = CommandSpec.builder()
-                .executor(new PixAuctionCommand())
-                .permission("pixelauction.command.auction")
-                .arguments(GenericArguments.seq(GenericArguments.optional(GenericArguments.integer(Text.of("slot"))), GenericArguments.optional(GenericArguments.integer(Text.of("price")))), GenericArguments.optional(GenericArguments.integer(Text.of("increment"))), GenericArguments.optional(GenericArguments.integer(Text.of("duration"))))
-                .child(AucHelp, "help", "?")
-                .build();
-
-
         CommandSpec pixBid = CommandSpec.builder().executor(new PixBidCommand())
                 .permission("pixelauction.command.bid")
                 .arguments(GenericArguments.onlyOne(GenericArguments.integer(Text.of("bid"))))
                 .build();
-
 
         CommandSpec pixAuctionCancel = CommandSpec.builder()
                 .executor(new PixAuctionCancelCommand())
@@ -99,11 +90,23 @@ public class PixelAuctionGenerations {
                 .executor(new PixAuctionSilenceCommand())
                 .permission("pixelauction.command.hide").build();
 
+        CommandSpec pixAuctionCreate = CommandSpec.builder()
+                .executor(new PixAuctionCommand())
+                .arguments(GenericArguments.seq(GenericArguments.optional(GenericArguments.integer(Text.of("slot"))), GenericArguments.optional(GenericArguments.integer(Text.of("price")))), GenericArguments.optional(GenericArguments.integer(Text.of("increment"))), GenericArguments.optional(GenericArguments.integer(Text.of("duration"))))
+                .permission("pixelauction.command.auction").build();
+
+        CommandSpec pixAuction = CommandSpec.builder()
+                .executor(new PixAuctionHelpCommand())
+                .permission("pixelauction.command.help")
+                .child(AucHelp, "help", "?")
+                .child(pixBid, "bid")
+                .child(pixAuctionCancel, "cancel")
+                .child(pixAuctionHide, "hide")
+                .child(pixAuctionCreate, "create", "new")
+                .build();
+
 
         Sponge.getCommandManager().register(this, pixAuction, "auc", "auction", "pauc");
-        Sponge.getCommandManager().register(this, pixBid, "aucbid", "auctionbid", "pabid");
-        Sponge.getCommandManager().register(this, pixAuctionCancel, "auccancel", "auctioncancel", "pacancel");
-        Sponge.getCommandManager().register(this, pixAuctionHide, "auchide", "auctionhide", "pahide");
         Sponge.getEventManager().registerListeners(this, new PlayerListener());
         try {
             if (!this.defaultConfig.exists()) {

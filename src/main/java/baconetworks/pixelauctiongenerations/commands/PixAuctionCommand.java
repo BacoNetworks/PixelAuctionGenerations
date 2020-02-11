@@ -29,14 +29,18 @@ public class PixAuctionCommand implements CommandExecutor {
 
         if (!(args.getOne("slot").isPresent())) {
             source.sendMessage(Text.of(TextColors.RED, "You are missing arguments:"));
-            throw new CommandException(Text.of(TextColors.RED, ("/auc <slot> <price> <increment> <duration>")));
+            throw new CommandException(Text.of(TextColors.RED, ("/auc create <slot> <price> <increment> <duration>")));
         }
 
         int slot = (Integer) args.getOne("slot").get();
 
+        if (slot < 1 || slot > 6) {
+            throw new CommandException(Text.of(TextColors.RED, "Invalid slot number, must be between 1-6!"));
+        }
+
         if (!(args.getOne("price").isPresent())) {
             source.sendMessage(Text.of(TextColors.RED, "You are missing arguments:"));
-            throw new CommandException(Text.of(TextColors.RED, ("/auc " + slot + " <price> <increment> <duration>")));
+            throw new CommandException(Text.of(TextColors.RED, ("/auc create " + slot + " <price> <increment> <duration>")));
         }
 
         int price = (Integer) args.getOne("price").get();
@@ -47,14 +51,14 @@ public class PixAuctionCommand implements CommandExecutor {
 
         if (!(args.getOne("increment").isPresent())) {
             source.sendMessage(Text.of(TextColors.RED, "You are missing arguments:"));
-            throw new CommandException(Text.of(TextColors.RED, ("/auc " + slot + " " + price + " <increment> <duration>")));
+            throw new CommandException(Text.of(TextColors.RED, ("/auc create " + slot + " " + price + " <increment> <duration>")));
         }
 
         int incrementation = (Integer) args.getOne("increment").get();
 
         if (!(args.getOne("duration").isPresent())) {
             source.sendMessage(Text.of(TextColors.RED, "You are an argument:"));
-            throw new CommandException(Text.of(TextColors.RED, ("/auc " + slot + " " + price + " " + incrementation + " <duration>")));
+            throw new CommandException(Text.of(TextColors.RED, ("/auc create " + slot + " " + price + " " + incrementation + " <duration>")));
         }
 
         int duration = (Integer) args.getOne("duration").get();
@@ -63,29 +67,6 @@ public class PixAuctionCommand implements CommandExecutor {
 
         if (playerPartyStorage.partyPokemon[slot - 1] == null || playerPartyStorage.partyPokemon[slot - 1].isEmpty()) {
             throw new CommandException(Text.of(TextColors.RED, "There is no pokemon in the slot you're trying to auction!"));
-        }
-
-        final List<Integer> cmdArgs = Arrays.asList(slot, price, incrementation, duration);
-
-
-        if (!plugin.getNeedConfirmation().containsKey(source.getUniqueId())) {
-            source.sendMessage(Text.of(TextColors.RED, "Type the command again to confirm your auction"));
-            plugin.getNeedConfirmation().put(source.getUniqueId(), cmdArgs);
-            return CommandResult.empty();
-        }
-        if (!plugin.getNeedConfirmation().get(source.getUniqueId()).equals(cmdArgs)) {
-            source.sendMessage(Text.of(TextColors.RED, "Type the command again to confirm your auction"));
-            plugin.getNeedConfirmation().replace(source.getUniqueId(), cmdArgs);
-            return CommandResult.empty();
-        }
-        plugin.getNeedConfirmation().remove(source.getUniqueId());
-
-        if (slot < 1 || slot > 6) {
-            throw new CommandException(Text.of(TextColors.RED, "Invalid slot number, must be 1-6!"));
-        }
-
-        if (price < 0) {
-            throw new CommandException(Text.of(TextColors.RED, "Invalid price, must be above $0!"));
         }
 
         if (incrementation < plugin.getConfigurationNode().getNode(new Object[]{"PixelAuction Configuration", "Minimum bid increment"}).getInt()) {
@@ -120,6 +101,7 @@ public class PixAuctionCommand implements CommandExecutor {
                 plugin.getCommandCooldowns().put(source.getUniqueId(), cooldown);
             }
         }
+
         if (!plugin.getCurrentAuctions().isEmpty()) {
             source.sendMessage(Text.of(TextColors.RED, "Another auction is already in place, you will be added to the queue!"));
 
@@ -131,6 +113,21 @@ public class PixAuctionCommand implements CommandExecutor {
                 throw new CommandException(Text.of(TextColors.RED, "You already have an Auction queued, please cancel your current auction to list another!"));
             }
         }
+
+        final List<Integer> cmdArgs = Arrays.asList(slot, price, incrementation, duration);
+
+        if (!plugin.getNeedConfirmation().containsKey(source.getUniqueId())) {
+            source.sendMessage(Text.of(TextColors.RED, "Type the command again to confirm your auction"));
+            plugin.getNeedConfirmation().put(source.getUniqueId(), cmdArgs);
+            return CommandResult.empty();
+        }
+        if (!plugin.getNeedConfirmation().get(source.getUniqueId()).equals(cmdArgs)) {
+            source.sendMessage(Text.of(TextColors.RED, "Type the command again to confirm your auction"));
+            plugin.getNeedConfirmation().replace(source.getUniqueId(), cmdArgs);
+            return CommandResult.empty();
+        }
+
+        plugin.getNeedConfirmation().remove(source.getUniqueId());
 
         PokemonAuction pokemonAuction = new PokemonAuction(source.getUniqueId(), System.currentTimeMillis() / 1000L, price, incrementation, duration);
 
