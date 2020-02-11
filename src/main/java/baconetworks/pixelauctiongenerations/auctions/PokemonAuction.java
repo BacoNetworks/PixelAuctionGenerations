@@ -179,6 +179,9 @@ public class PokemonAuction {
             hiddenIVs = Utils.getHoverText(pokemon, getSeller(), null, getPrice(), getAuctionTime(), getBidIncrement(), false, false);
         }
 
+        //Send to the console as well so that we have a sort of auction record!
+        Sponge.getServer().getConsole().sendMessage(chatMessage);
+
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             if (!plugin.getHideMessages().contains(player.getUniqueId())) {
                 EntityPlayer ePlayer = (EntityPlayer) player;
