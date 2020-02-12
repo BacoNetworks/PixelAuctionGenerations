@@ -3,8 +3,12 @@ package baconetworks.pixelauctiongenerations.commands;
 import baconetworks.pixelauctiongenerations.PixelAuctionGenerations;
 import baconetworks.pixelauctiongenerations.auctions.PokemonAuction;
 import baconetworks.pixelauctiongenerations.utils.CommandCooldown;
+import com.pixelmonmod.pixelmon.config.PixelmonEntityList;
+import com.pixelmonmod.pixelmon.entities.pixelmon.EntityPixelmon;
 import com.pixelmonmod.pixelmon.storage.PixelmonStorage;
 import com.pixelmonmod.pixelmon.storage.PlayerStorage;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -67,6 +71,14 @@ public class PixAuctionCommand implements CommandExecutor {
 
         if (playerPartyStorage.partyPokemon[slot - 1] == null || playerPartyStorage.partyPokemon[slot - 1].isEmpty()) {
             throw new CommandException(Text.of(TextColors.RED, "There is no pokemon in the slot you're trying to auction!"));
+        }
+
+        if (playerPartyStorage.partyPokemon[slot - 1] != null) {
+            World world = DimensionManager.getWorld(0);
+            EntityPixelmon pokemon = (EntityPixelmon) PixelmonEntityList.createEntityFromNBT(playerPartyStorage.partyPokemon[slot - 1], world);
+            if (!(pokemon.isInBall)) {
+                throw new CommandException(Text.of(TextColors.RED, "You cannot list a Pokemon that is outside of it's ball!"));
+            }
         }
 
         if (incrementation < plugin.getConfigurationNode().getNode(new Object[]{"PixelAuction Configuration", "Minimum bid increment"}).getInt()) {

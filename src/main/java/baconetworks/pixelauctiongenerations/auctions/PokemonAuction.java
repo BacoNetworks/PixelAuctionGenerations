@@ -153,7 +153,7 @@ public class PokemonAuction {
         } else {
             World world = DimensionManager.getWorld(0);
             EntityPixelmon pokemon = (EntityPixelmon) PixelmonEntityList.createEntityFromNBT(getPokemonForSale(), world);
-            Cancelled = Text.of(TextColors.RED, "Unfortunately your auction fell through,", Text.NEW_LINE, "your Pokemon has been returned to your pc due to your party being full");
+            Cancelled = Text.of(TextColors.RED, "Unfortunately your auction fell through,", Text.NEW_LINE, "your Pokemon has been returned to your pc", Text.NEW_LINE, "due to your party being full");
             playerPartyStorage.addToPC(pokemon);
         }
         if (this.auctionTime < 1) {
